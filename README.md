@@ -17,14 +17,10 @@ Checking out &  Building the client
      cd muscle-client
      mvn clean install
 	 
-After that you should have a file called "muscle-submit-lib.jar" in the target directory. Which you can add in the classpath of your application. You also need to download the following file and put it in the same directory as "muscle-submit-lib.jar":
+After that you should have a file called "muscle-submit-lib.jar" in the target directory. Which you can add in the classpath of your application. You also need to download the following library and add it to your classpath:
 
     http://code.ceres.auckland.ac.nz/webstart/bcprov.jar
 	
-and run it via
-
-    java -jar muscle-submit-lib.jar <myproxy_username> <myproxy_password> <path_to_fasta_input_file>
-	 
 ### Eclipse
 
 (Eclipse needs m2e plugin)
@@ -45,5 +41,24 @@ Change Run configuration and specify 3 program arguments (in that order):
  * myproxy password
  * path of your fasta input file
 
+Download prebuild package
+----------------------------------------
+
+Download the latest build from:
+
+    https://code.ceres.auckland.ac.nz/jenkins/job/Muscle-Client/
+	
+In addition, you need the bouncy castle library in your classpath:
+
+    http://code.ceres.auckland.ac.nz/webstart/bcprov.jar
+	
+Run the client from the commandline
+-----------------------------------------------------
+
+Put bcprov.jar in same directory as muscle-submit-lib.jar and start via:
+
+    java -jar muscle-submit-lib.jar <myproxy_username> <myproxy_password> <path_to_fasta_input_file>
+	 
+In the background, the client authenticates, uploads the fasta files, submits the job, waits for the job to finish, and downloads stdout & stderr as well as the fasta output file....
 
 
