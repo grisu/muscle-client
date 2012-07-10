@@ -2,6 +2,7 @@ import grisu.control.JobConstants;
 import grisu.control.ServiceInterface;
 import grisu.control.exceptions.JobPropertiesException;
 import grisu.control.exceptions.JobSubmissionException;
+import grisu.control.exceptions.NoSuchJobException;
 import grisu.frontend.control.login.LoginManager;
 import grisu.frontend.model.job.JobException;
 import grisu.frontend.model.job.JobObject;
@@ -27,11 +28,9 @@ public class MuscleJob {
 	 */
 	public static void main(String[] args) throws Exception {
 
-
 		System.out.println("Logging in...");
 		ServiceInterface si = LoginManager.myProxyLogin(args[0],
-				args[1].toCharArray(), "BeSTGRID",
-				true);
+				args[1].toCharArray(), "BeSTGRID", true);
 
 		System.out.println("Creating muscle job...");
 		MuscleJob mj = new MuscleJob(si);
@@ -39,6 +38,14 @@ public class MuscleJob {
 		mj.setFastaInputFile(args[2]);
 		System.out.println("Submitting job...");
 		String jobname = mj.submit();
+
+		// depending on how you want to keep track of all jobs in your portal,
+		// you can always re-create a (already submitted) MuscleJob object just
+		// using the serviceinterface and jobname. So, the following is only
+		// required if you lost the reference to your MuscleJob object...
+		mj = new MuscleJob(si, jobname);
+
+
 		System.out.println("Job submitted (jobname: " + jobname
 				+ "), now waiting for it to finish...");
 		mj.waitForJobToFinish(10);
@@ -60,7 +67,6 @@ public class MuscleJob {
 		System.out.println("File downloaded, filesize (in bytes): "
 				+ fastaOutputFile.length());
 		System.out.println("File location: " + fastaOutputFile.toString());
-
 
 		// don't do this in your webapp, this is only to close all daemons that
 		// might have been created in the cli version...
@@ -94,7 +100,8 @@ public class MuscleJob {
 	private final int DEFAULT_WALLTIME = 3500;
 
 	/**
-	 * Default group which is used to submit the job. Not sure whether that needs to change, if so, we just create another setter.
+	 * Default group which is used to submit the job. Not sure whether that
+	 * needs to change, if so, we just create another setter.
 	 */
 	private final String DEFAULT_GROUP = "/nz/nesi";
 
@@ -139,6 +146,12 @@ public class MuscleJob {
 		this.job.setWalltimeInSeconds(DEFAULT_WALLTIME);
 	}
 
+	public MuscleJob(ServiceInterface si, String jobname)
+			throws NoSuchJobException {
+		this.si = si;
+		this.job = new JobObject(si, jobname);
+	}
+
 	/**
 	 * Downloads and caches the fastaOutputFile in the .grisu/cache directory.
 	 * 
@@ -150,7 +163,7 @@ public class MuscleJob {
 
 		int status = this.job.getStatus(true);
 
-		if ( status < JobConstants.FINISHED_EITHER_WAY) {
+		if (status < JobConstants.FINISHED_EITHER_WAY) {
 			throw new JobException(this.job, "Job not finished yet.");
 		}
 
@@ -159,9 +172,10 @@ public class MuscleJob {
 		return outputFile;
 	}
 
-	public String getFastaOutputFilename() {
-		if ( StringUtils.isBlank(this.fastaOutputFileName ) ) {
-			this.fastaOutputFileName = this.job.getJobProperty(FASTA_OUTPUT_FILENAME_KEY);
+	public synchronized String getFastaOutputFilename() {
+		if (StringUtils.isBlank(this.fastaOutputFileName)) {
+			this.fastaOutputFileName = this.job
+					.getJobProperty(FASTA_OUTPUT_FILENAME_KEY);
 		}
 		return this.fastaOutputFileName;
 	}
@@ -174,7 +188,8 @@ public class MuscleJob {
 	 */
 	public String getFastaOutputFileUrl() {
 		String jobdir = this.job.getJobDirectoryUrl();
-		String outputFilename = this.job.getJobProperty(FASTA_OUTPUT_FILENAME_KEY);
+		String outputFilename = this.job
+				.getJobProperty(FASTA_OUTPUT_FILENAME_KEY);
 		return jobdir + "/" + outputFilename;
 	}
 
