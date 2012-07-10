@@ -23,7 +23,7 @@ public class MuscleJob {
 	 * submit/monitor/download jobs.
 	 * 
 	 * @param args
-	 *            not used
+	 *            myproxy-username myproxy-password path-to-fasta-input-file
 	 * @throws Exception
 	 *             if something goes wrong
 	 */
