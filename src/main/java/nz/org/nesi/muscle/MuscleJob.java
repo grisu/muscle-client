@@ -1,3 +1,4 @@
+package nz.org.nesi.muscle;
 import grisu.control.JobConstants;
 import grisu.control.ServiceInterface;
 import grisu.control.exceptions.JobPropertiesException;

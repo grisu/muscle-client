@@ -58,7 +58,7 @@
 							<archive>
 								<index>true</index>
 								<manifest>
-									<mainClass>MuscleJob</mainClass>
+									<mainClass>nz.org.nesi.muscle.MuscleJob</mainClass>
 								</manifest>
 								<manifestEntries>
 									<Class-Path>bcprov.jar bcprov-jdk15-143.jar
