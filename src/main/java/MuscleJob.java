@@ -29,17 +29,14 @@ public class MuscleJob {
 
 
 		System.out.println("Logging in...");
-
-		// the serviceinterface object only has to be created once. for your
-		// portal, we'd do in a different way, come back to me once you are
-		// about to integrate this piece of code...
-		// for now, this will only ask for a password every 10 day
-		ServiceInterface si = LoginManager.loginCommandline("BeSTGRID");
+		ServiceInterface si = LoginManager.myProxyLogin(args[0],
+				args[1].toCharArray(), "BeSTGRID",
+				true);
 
 		System.out.println("Creating muscle job...");
 		MuscleJob mj = new MuscleJob(si);
-		System.out.println("Setting input file: " + args[0]);
-		mj.setFastaInputFile(args[0]);
+		System.out.println("Setting input file: " + args[2]);
+		mj.setFastaInputFile(args[2]);
 		System.out.println("Submitting job...");
 		String jobname = mj.submit();
 		System.out.println("Job submitted (jobname: " + jobname

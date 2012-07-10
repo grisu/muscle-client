@@ -7,7 +7,7 @@
   </parent>
   <groupId>nz.org.nesi</groupId>
   <artifactId>muscle-submit</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.1-SNAPSHOT</version>
   
 	<repositories>
 		<repository>
@@ -38,4 +38,44 @@
 			<version>1.45</version>
 		</dependency>
 	</dependencies>
+	
+	<build>
+		<plugins>
+	
+				<!-- you can disable the assembly plugin if you want, your builds will
+				be faster I find it quite handy to have maven build an executable jar, though -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+
+							<descriptors>
+								<descriptor>client.assembly.xml</descriptor>
+							</descriptors>
+							<finalName>muscle-submit</finalName>
+							<archive>
+								<index>true</index>
+								<manifest>
+									<mainClass>MuscleJob</mainClass>
+								</manifest>
+								<manifestEntries>
+									<Class-Path>bcprov.jar bcprov-jdk15-143.jar
+										local-backend-dev.jar local-backend.jar
+										grisu-client-dependencies.jar</Class-Path>
+								</manifestEntries>
+							</archive>
+
+						</configuration>
+						<goals>
+							<goal>attached</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+	
 </project>
