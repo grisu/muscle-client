@@ -153,6 +153,17 @@ public class MuscleJob {
 		this.job.setWalltimeInSeconds(DEFAULT_WALLTIME);
 	}
 
+	/**
+	 * Use this constructor if you already submitted a muscle job and have the
+	 * jobname as a reference.
+	 * 
+	 * @param si
+	 *            the serviceinterface
+	 * @param jobname
+	 *            the name of the (already submitted) job
+	 * @throws NoSuchJobException
+	 *             if no job with the specified jobname exists
+	 */
 	public MuscleJob(ServiceInterface si, String jobname)
 			throws NoSuchJobException {
 		this.si = si;
@@ -179,6 +190,11 @@ public class MuscleJob {
 		return outputFile;
 	}
 
+	/**
+	 * The filename of the fasta output file for this job.
+	 * 
+	 * @return the filename
+	 */
 	public synchronized String getFastaOutputFilename() {
 		if (StringUtils.isBlank(this.fastaOutputFileName)) {
 			this.fastaOutputFileName = this.job
