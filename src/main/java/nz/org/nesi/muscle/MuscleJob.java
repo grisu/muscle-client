@@ -30,6 +30,10 @@ public class MuscleJob {
 	public static void main(String[] args) throws Exception {
 
 		System.out.println("Logging in...");
+		// the next line creates the ServiceInterface which is your session
+		// object and which connects you with the grid and its resources.
+		// The login here is just to get you going developing, we'll provide
+		// you with your own credential later on.
 		ServiceInterface si = LoginManager.myProxyLogin(args[0],
 				args[1].toCharArray(), "BeSTGRID", true);
 
@@ -42,8 +46,10 @@ public class MuscleJob {
 
 		// depending on how you want to keep track of all jobs in your portal,
 		// you can always re-create a (already submitted) MuscleJob object just
-		// using the serviceinterface and jobname. So, the following is only
-		// required if you lost the reference to your MuscleJob object...
+		// using the serviceinterface and jobname. So, the following line is
+		// only
+		// required if you lost the reference to your MuscleJob object. If you
+		// still have it then re-use it. That is faster...
 		mj = new MuscleJob(si, jobname);
 
 
