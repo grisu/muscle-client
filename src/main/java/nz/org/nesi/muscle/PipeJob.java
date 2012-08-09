@@ -1,4 +1,5 @@
 package nz.org.nesi.muscle;
+
 import grisu.control.JobConstants;
 import grisu.control.ServiceInterface;
 import grisu.control.exceptions.JobPropertiesException;
@@ -7,21 +8,18 @@ import grisu.control.exceptions.NoSuchJobException;
 import grisu.frontend.control.login.LoginManager;
 import grisu.frontend.model.job.JobException;
 import grisu.frontend.model.job.JobObject;
-import grisu.jcommons.constants.Constants;
-import grisu.model.FileManager;
 
 import java.io.File;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.python.google.common.collect.Maps;
 
-public class MuscleJob {
+public class PipeJob {
 
 	/**
 	 * Just an example control structure to see how one can
 	 * submit/monitor/download jobs.
-	 * 
+	 *
 	 * @param args
 	 *            myproxy-username myproxy-password path-to-fasta-input-file
 	 * @throws Exception
@@ -34,12 +32,14 @@ public class MuscleJob {
 		// object and which connects you with the grid and its resources.
 		// The login here is just to get you going developing, we'll provide
 		// you with your own credential later on.
+		// ServiceInterface si = LoginManager.myProxyLogin(args[0],
+		// args[1].toCharArray(), "BeSTGRID", true);
 		ServiceInterface si = LoginManager.loginCommandline("nesi");
 
-		System.out.println("Creating muscle job...");
-		MuscleJob mj = new MuscleJob(si);
-		System.out.println("Setting input file: " + args[0]);
-		mj.setFastaInputFile(args[0]);
+		System.out.println("Creating pipe job...");
+		PipeJob mj = new PipeJob(si);
+		//System.out.println("Setting input file: " + args[2]);
+		//mj.setFastaInputFile(args[2]);
 		System.out.println("Submitting job...");
 		String jobname = mj.submit();
 
@@ -49,7 +49,7 @@ public class MuscleJob {
 		// only
 		// required if you lost the reference to your MuscleJob object. If you
 		// still have it then re-use it. That is faster...
-		mj = new MuscleJob(si, jobname);
+		mj = new PipeJob(si, jobname);
 
 
 		System.out.println("Job submitted (jobname: " + jobname
@@ -65,19 +65,18 @@ public class MuscleJob {
 		System.out.println("\nStderr:\n");
 		System.out.println(mj.getStderrContent());
 
-		String fastaoutputurl = mj.getFastaOutputFileUrl();
-
-		System.out.println("Downloading fasta output file: " + fastaoutputurl);
-
-		File fastaOutputFile = mj.getFastaOutput();
-		System.out.println("File downloaded, filesize (in bytes): "
-				+ fastaOutputFile.length());
-		System.out.println("File location: " + fastaOutputFile.toString());
+		//		String fastaoutputurl = mj.getFastaOutputFileUrl();
+		//
+		//		System.out.println("Downloading fasta output file: " + fastaoutputurl);
+		//
+		//		File fastaOutputFile = mj.getFastaOutput();
+		//		System.out.println("File downloaded, filesize (in bytes): "
+		//				+ fastaOutputFile.length());
+		//		System.out.println("File location: " + fastaOutputFile.toString());
 
 		// don't do this in your webapp, this is only to close all daemons that
 		// might have been created in the cli version...
 		System.exit(0);
-
 	}
 
 	/**
@@ -90,14 +89,14 @@ public class MuscleJob {
 	 * Path to the muscle executable on Pan. I guess we can hardcode this one
 	 * too...
 	 */
-	private final String PATH_TO_MUSCLE_EXE = "/share/apps/muscle-3.8.31/bin/muscle";
+	private final String COMMAND = "python /home/mbin029/awcore/i.py";
 
 	/**
 	 * Every job can have properties associated with it. In this case we store
 	 * the name of the fasta output file with the job, just in case we might
 	 * want to look up later on.
 	 */
-	private final String FASTA_OUTPUT_FILENAME_KEY = "fastaOutputFilename";
+	//private final String FASTA_OUTPUT_FILENAME_KEY = "fastaOutputFilename";
 
 	/**
 	 * Default walltime, a bit less than 1 hour. That way we always end up in
@@ -118,7 +117,7 @@ public class MuscleJob {
 	 */
 	private final ServiceInterface si;
 	/**
-	 * The {@link JobObject} is the model that contains all the logic that is
+	 * The {@link grisu.frontend.model.job.JobObject} is the model that contains all the logic that is
 	 * needed to submit and control a generic job. We wrap around it with
 	 * specific "muscle" logic.
 	 */
@@ -127,25 +126,26 @@ public class MuscleJob {
 	/**
 	 * The fasta input file.
 	 */
-	private String fastaInputFile = null;
+	//private String fastaInputFile = null;
 
 	/**
 	 * The fasta name, we keep that to name the job and output file.
 	 */
-	private String fastaName = null;
-	private String fastaFileName = null;
-	private String fastaOutputFileName = null;
+	//private String fastaName = null;
+	//private String fastaFileName = null;
+	//private String fastaOutputFileName = null;
 
 	/**
 	 * For every job we submit, we create a new MuscleJob object.
-	 * 
+	 *
 	 * @param si
 	 *            the serviceInterface
 	 */
-	public MuscleJob(ServiceInterface si) {
+	public PipeJob(ServiceInterface si) {
 		this.si = si;
 		this.job = new JobObject(si);
-		this.job.setApplication(Constants.GENERIC_APPLICATION_NAME);
+		this.job.setApplication("python");
+		this.job.setApplicationVersion("2.7");
 		this.job.setCpus(1);
 		this.job.setForce_single(true);
 		this.job.setSubmissionLocation(QUEUE);
@@ -155,15 +155,15 @@ public class MuscleJob {
 	/**
 	 * Use this constructor if you already submitted a muscle job and have the
 	 * jobname as a reference.
-	 * 
+	 *
 	 * @param si
 	 *            the serviceinterface
 	 * @param jobname
 	 *            the name of the (already submitted) job
-	 * @throws NoSuchJobException
+	 * @throws grisu.control.exceptions.NoSuchJobException
 	 *             if no job with the specified jobname exists
 	 */
-	public MuscleJob(ServiceInterface si, String jobname)
+	public PipeJob(ServiceInterface si, String jobname)
 			throws NoSuchJobException {
 		this.si = si;
 		this.job = new JobObject(si, jobname);
@@ -171,9 +171,9 @@ public class MuscleJob {
 
 	/**
 	 * Downloads and caches the fastaOutputFile in the .grisu/cache directory.
-	 * 
+	 *
 	 * After download, you can just move the file whereever you want.
-	 * 
+	 *
 	 * @return the File object for the cached fasta output file
 	 */
 	public File getFastaOutput() {
@@ -191,36 +191,38 @@ public class MuscleJob {
 
 	/**
 	 * The filename of the fasta output file for this job.
-	 * 
+	 *
 	 * @return the filename
 	 */
 	public synchronized String getFastaOutputFilename() {
-		if (StringUtils.isBlank(this.fastaOutputFileName)) {
-			this.fastaOutputFileName = this.job
-					.getJobProperty(FASTA_OUTPUT_FILENAME_KEY);
-		}
-		return this.fastaOutputFileName;
+		//		if (StringUtils.isBlank(this.fastaOutputFileName)) {
+		//			this.fastaOutputFileName = this.job
+		//					.getJobProperty(FASTA_OUTPUT_FILENAME_KEY);
+		//		}
+		//		return this.fastaOutputFileName;
+		return null;
 	}
 
 	/**
 	 * Returns the url of the fasta output file (obviously only works once job
 	 * was submitted).
-	 * 
+	 *
 	 * @return the url
 	 */
 	public String getFastaOutputFileUrl() {
-		String jobdir = this.job.getJobDirectoryUrl();
-		String outputFilename = this.job
-				.getJobProperty(FASTA_OUTPUT_FILENAME_KEY);
-		return jobdir + "/" + outputFilename;
+		//		String jobdir = this.job.getJobDirectoryUrl();
+		//		String outputFilename = this.job
+		//				.getJobProperty(FASTA_OUTPUT_FILENAME_KEY);
+		//		return jobdir + "/" + outputFilename;
+		return null;
 	}
 
 	/**
-	 * Returns the status of the job (look up {@link JobConstants} for what the
+	 * Returns the status of the job (look up {@link grisu.control.JobConstants} for what the
 	 * int value means.
-	 * 
+	 *
 	 * Or use {@link #getJobStatusString()} method.
-	 * 
+	 *
 	 * @return the job status
 	 */
 	public int getJobStatus() {
@@ -229,7 +231,7 @@ public class MuscleJob {
 
 	/**
 	 * Returns the job status as a string.
-	 * 
+	 *
 	 * @return the job status
 	 */
 	public String getJobStatusString() {
@@ -239,7 +241,7 @@ public class MuscleJob {
 	/**
 	 * Returns the current content of the stderr file associated with this job.
 	 * (Re-)downloads stderr if not already cached...
-	 * 
+	 *
 	 * @return the content of the stderr file
 	 */
 	public String getStderrContent() {
@@ -249,7 +251,7 @@ public class MuscleJob {
 	/**
 	 * Returns the current content of the stdout file associated with this job.
 	 * (Re-)downloads stdout if not already cached...
-	 * 
+	 *
 	 * @return the content of the stdout file
 	 */
 	public String getStdoutContent() {
@@ -258,25 +260,25 @@ public class MuscleJob {
 
 	/**
 	 * Sets the fasta input file.
-	 * 
+	 *
 	 * @param inputFile
 	 *            the input file (can be local path or remote gsiftp/grid
 	 *            protocol)
 	 */
 	public void setFastaInputFile(String inputFile) {
-		this.fastaInputFile = inputFile;
-		// calculating the fasta name
-		this.fastaFileName = FileManager.getFilename(this.fastaInputFile);
-		this.fastaName = this.fastaFileName.substring(0,
-				this.fastaFileName.lastIndexOf("."));
-		this.fastaOutputFileName = "Aligned_" + this.fastaFileName;
+		//		this.fastaInputFile = inputFile;
+		//		// calculating the fasta name
+		//		this.fastaFileName = FileManager.getFilename(this.fastaInputFile);
+		//		this.fastaName = this.fastaFileName.substring(0,
+		//				this.fastaFileName.lastIndexOf("."));
+		//		this.fastaOutputFileName = "Aligned_" + this.fastaFileName;
 
 	}
 
 	/**
 	 * The default is a bit less than 1 hour. Set this higher (or lower) if
 	 * necessary.
-	 * 
+	 *
 	 * @param walltime
 	 *            the walltime of the muscle job in seconds
 	 */
@@ -286,23 +288,22 @@ public class MuscleJob {
 
 	/**
 	 * Submits the job to the cluster.
-	 * 
+	 *
 	 * @return the jobname of the submitted job
-	 * @throws JobSubmissionException
+	 * @throws grisu.control.exceptions.JobSubmissionException
 	 *             if the submission fails for some reason
 	 */
 	public String submit() throws JobSubmissionException {
-		if (StringUtils.isBlank(this.fastaInputFile)) {
-			throw new JobSubmissionException("No fasta input file specified.");
-		}
+		//		if (StringUtils.isBlank(this.fastaInputFile)) {
+		//			throw new JobSubmissionException("No fasta input file specified.");
+		//		}
 
 		// not sure whether that makes sense in your case, but we'll set the
 		// jobname to be the name of the fasta input file plus a timestamp
-		job.setTimestampJobname(fastaName);
+		job.setTimestampJobname("pipe");
 
-		job.addInputFileUrl(this.fastaInputFile);
-		job.setCommandline(PATH_TO_MUSCLE_EXE + " -in " + fastaFileName
-				+ " -out " + fastaOutputFileName + " -maxiters 2");
+		//job.addInputFileUrl(this.fastaInputFile);
+		job.setCommandline(COMMAND + " --help");
 
 		try {
 			job.createJob(DEFAULT_GROUP);
@@ -312,8 +313,8 @@ public class MuscleJob {
 		}
 
 		Map<String, String> additionalJobProperties = Maps.newHashMap();
-		additionalJobProperties.put(FASTA_OUTPUT_FILENAME_KEY,
-				fastaOutputFileName);
+		//		additionalJobProperties.put(FASTA_OUTPUT_FILENAME_KEY,
+		//				fastaOutputFileName);
 
 		try {
 			job.submitJob(additionalJobProperties);
