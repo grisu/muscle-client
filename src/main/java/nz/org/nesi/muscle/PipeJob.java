@@ -8,6 +8,8 @@ import grisu.control.exceptions.NoSuchJobException;
 import grisu.frontend.control.login.LoginManager;
 import grisu.frontend.model.job.JobException;
 import grisu.frontend.model.job.JobObject;
+import grith.jgrith.cred.Cred;
+import grith.jgrith.cred.MyProxyCred;
 
 import java.io.File;
 import java.util.Map;
@@ -34,7 +36,12 @@ public class PipeJob {
 		// you with your own credential later on.
 		// ServiceInterface si = LoginManager.myProxyLogin(args[0],
 		// args[1].toCharArray(), "BeSTGRID", true);
-		ServiceInterface si = LoginManager.loginCommandline("nesi");
+		// ServiceInterface si = LoginManager.loginCommandline("nesi");
+
+		Cred cred = new MyProxyCred(args[0], args[1].toCharArray(),
+				"myproxy.nesi.org.nz");
+		ServiceInterface si = LoginManager.login("nesi", cred, false);
+
 
 		System.out.println("Creating pipe job...");
 		PipeJob mj = new PipeJob(si);
@@ -89,7 +96,7 @@ public class PipeJob {
 	 * Path to the muscle executable on Pan. I guess we can hardcode this one
 	 * too...
 	 */
-	private final String COMMAND = "python /home/mbin029/awcore/i.py";
+	private final String COMMAND = "python /home/test9.ceres.auckland.ac.nz/awcore/i.py";
 
 	/**
 	 * Every job can have properties associated with it. In this case we store
