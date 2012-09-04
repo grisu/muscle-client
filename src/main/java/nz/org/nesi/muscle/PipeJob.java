@@ -8,8 +8,10 @@ import grisu.control.exceptions.NoSuchJobException;
 import grisu.frontend.control.login.LoginManager;
 import grisu.frontend.model.job.JobException;
 import grisu.frontend.model.job.JobObject;
+import grith.jgrith.cred.AbstractCred;
 import grith.jgrith.cred.Cred;
 import grith.jgrith.cred.MyProxyCred;
+import grith.jgrith.cred.ProxyCred;
 
 import java.io.File;
 import java.util.Map;
@@ -29,19 +31,25 @@ public class PipeJob {
 	 */
 	public static void main(String[] args) throws Exception {
 
-		System.out.println("Logging in...");
-		// the next line creates the ServiceInterface which is your session
-		// object and which connects you with the grid and its resources.
-		// The login here is just to get you going developing, we'll provide
-		// you with your own credential later on.
-		// ServiceInterface si = LoginManager.myProxyLogin(args[0],
-		// args[1].toCharArray(), "BeSTGRID", true);
-		// ServiceInterface si = LoginManager.loginCommandline("nesi");
+		LoginManager.initEnvironment();
+		
+		ServiceInterface si = null;
+		ProxyCred cred = null;
+		
+		try {
+			cred = new ProxyCred();
+		} catch (Exception e) {
+			// doesn't matter
+		}
 
-		Cred cred = new MyProxyCred(args[0], args[1].toCharArray(),
-				"myproxy.nesi.org.nz");
-		ServiceInterface si = LoginManager.login("nesi", cred, false);
-
+		if ( cred != null && cred.isValid() ) {
+			System.out.println("Logging in. Using existing credential from "+cred.getProxyPath());
+			si = LoginManager.login("nesi", cred, false);
+		} else {
+			System.out.println("No valid credential found, using commandline login...");
+			si = LoginManager.loginCommandline("nesi");
+		}
+		
 
 		System.out.println("Creating pipe job...");
 		PipeJob mj = new PipeJob(si);
