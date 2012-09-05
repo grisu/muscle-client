@@ -3,7 +3,7 @@
   <parent>
     <groupId>nz.org.nesi</groupId>
     <artifactId>nesi</artifactId>
-    <version>0.19</version>
+    <version>0.20</version>
   </parent>
   <groupId>nz.org.nesi</groupId>
   <artifactId>muscle-submit</artifactId>

@@ -34,7 +34,7 @@ public class MuscleJob {
 		// object and which connects you with the grid and its resources.
 		// The login here is just to get you going developing, we'll provide
 		// you with your own credential later on.
-		ServiceInterface si = LoginManager.loginCommandline("nesi");
+		ServiceInterface si = LoginManager.loginCommandline("bestgrid");
 
 		System.out.println("Creating muscle job...");
 		MuscleJob mj = new MuscleJob(si);

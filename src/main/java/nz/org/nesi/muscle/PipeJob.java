@@ -44,10 +44,10 @@ public class PipeJob {
 
 		if ( cred != null && cred.isValid() ) {
 			System.out.println("Logging in. Using existing credential from "+cred.getProxyPath());
-			si = LoginManager.login("nesi", cred, false);
+			si = LoginManager.login("bestgrid", cred, false);
 		} else {
 			System.out.println("No valid credential found, using commandline login...");
-			si = LoginManager.loginCommandline("nesi");
+			si = LoginManager.loginCommandline("bestgrid");
 		}
 		
 
