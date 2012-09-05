@@ -78,4 +78,9 @@
 		</plugins>
 	</build>
 	
+	<scm>
+		<url>https://github.com/grisu/muscle-client</url>
+		<connection>scm:git:git://github.com/grisu/muscle-client.git</connection>
+		<developerConnection>scm:git:git@github.com:grisu/muscle-client.git</developerConnection>
+	</scm>
 </project>
